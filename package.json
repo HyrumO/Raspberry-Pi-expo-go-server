@@ -1,0 +1,29 @@
+{
+  "name": "expo-ngrok-server",
+  "version": "1.0.0",
+  "description": "Expo Go server with ngrok tunnel and basic authentication",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "expo",
+    "ngrok",
+    "tunnel",
+    "development",
+    "server"
+  ],
+  "author": "",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@expo/cli": "^0.18.0",
+    "qrcode": "^1.5.3",
+    "qrcode-terminal": "^0.12.0",
+    "dotenv": "^16.3.1"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
+

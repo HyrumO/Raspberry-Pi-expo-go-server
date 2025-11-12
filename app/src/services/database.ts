@@ -92,10 +92,13 @@ export async function initDatabase(): Promise<void> {
 // Deck operations
 export async function createDeck(input: CreateDeckInput): Promise<number> {
   if (!db) throw new Error('Database not initialized');
+  if (!input.name || input.name.trim().length === 0) {
+    throw new Error('Deck name is required');
+  }
   
   const result = await db.runAsync(
     'INSERT INTO decks (name, description) VALUES (?, ?)',
-    [input.name, input.description || null]
+    [input.name.trim(), input.description?.trim() || null]
   );
   return result.lastInsertRowId;
 }
@@ -109,6 +112,7 @@ export async function getDecks(): Promise<Deck[]> {
 
 export async function getDeckById(id: number): Promise<Deck | null> {
   if (!db) throw new Error('Database not initialized');
+  if (!id || id <= 0) throw new Error('Invalid deck ID');
   
   const result = await db.getFirstAsync<Deck>('SELECT * FROM decks WHERE id = ?', [id]);
   return result || null;
@@ -116,6 +120,13 @@ export async function getDeckById(id: number): Promise<Deck | null> {
 
 export async function deleteDeck(id: number): Promise<void> {
   if (!db) throw new Error('Database not initialized');
+  if (!id || id <= 0) throw new Error('Invalid deck ID');
+  
+  // Verify deck exists
+  const deck = await getDeckById(id);
+  if (!deck) {
+    throw new Error('Deck not found');
+  }
   
   await db.runAsync('DELETE FROM decks WHERE id = ?', [id]);
 }
@@ -123,17 +134,30 @@ export async function deleteDeck(id: number): Promise<void> {
 // Card operations
 export async function createCard(input: CreateCardInput): Promise<number> {
   if (!db) throw new Error('Database not initialized');
+  if (!input.deck_id || input.deck_id <= 0) throw new Error('Invalid deck ID');
+  if (!input.front || input.front.trim().length === 0) {
+    throw new Error('Card front text is required');
+  }
+  if (!input.back || input.back.trim().length === 0) {
+    throw new Error('Card back text is required');
+  }
+  
+  // Verify deck exists
+  const deck = await getDeckById(input.deck_id);
+  if (!deck) {
+    throw new Error('Deck not found');
+  }
   
   const result = await db.runAsync(
     `INSERT INTO cards (deck_id, front, back, audio_path, example_sentence, pronunciation)
      VALUES (?, ?, ?, ?, ?, ?)`,
     [
       input.deck_id,
-      input.front,
-      input.back,
-      input.audio_path || null,
-      input.example_sentence || null,
-      input.pronunciation || null,
+      input.front.trim(),
+      input.back.trim(),
+      input.audio_path?.trim() || null,
+      input.example_sentence?.trim() || null,
+      input.pronunciation?.trim() || null,
     ]
   );
   
@@ -155,6 +179,7 @@ export async function createCard(input: CreateCardInput): Promise<number> {
 
 export async function getCardsByDeck(deckId: number): Promise<Card[]> {
   if (!db) throw new Error('Database not initialized');
+  if (!deckId || deckId <= 0) throw new Error('Invalid deck ID');
   
   const result = await db.getAllAsync<Card>(
     'SELECT * FROM cards WHERE deck_id = ? ORDER BY created_at DESC',
@@ -165,14 +190,36 @@ export async function getCardsByDeck(deckId: number): Promise<Card[]> {
 
 export async function getCardById(id: number): Promise<Card | null> {
   if (!db) throw new Error('Database not initialized');
+  if (!id || id <= 0) throw new Error('Invalid card ID');
   
   const result = await db.getFirstAsync<Card>('SELECT * FROM cards WHERE id = ?', [id]);
   return result || null;
 }
 
+export async function deleteCard(id: number): Promise<void> {
+  if (!db) throw new Error('Database not initialized');
+  if (!id || id <= 0) throw new Error('Invalid card ID');
+  
+  // Get the card to find its deck_id before deletion
+  const card = await getCardById(id);
+  if (!card) {
+    throw new Error('Card not found');
+  }
+  
+  // Delete the card (card_progress will be deleted via CASCADE)
+  await db.runAsync('DELETE FROM cards WHERE id = ?', [id]);
+  
+  // Update deck card count
+  await db.runAsync(
+    'UPDATE decks SET card_count = GREATEST(0, card_count - 1), updated_at = datetime("now") WHERE id = ?',
+    [card.deck_id]
+  );
+}
+
 // Card progress operations
 export async function getCardProgress(cardId: number): Promise<CardProgress | null> {
   if (!db) throw new Error('Database not initialized');
+  if (!cardId || cardId <= 0) throw new Error('Invalid card ID');
   
   const result = await db.getFirstAsync<CardProgress>(
     'SELECT * FROM card_progress WHERE card_id = ?',
@@ -183,6 +230,9 @@ export async function getCardProgress(cardId: number): Promise<CardProgress | nu
 
 export async function getCardsDueForReview(limit: number = 20): Promise<Card[]> {
   if (!db) throw new Error('Database not initialized');
+  if (limit <= 0 || limit > 1000) {
+    throw new Error('Limit must be between 1 and 1000');
+  }
   
   const result = await db.getAllAsync<Card>(
     `SELECT c.* FROM cards c
@@ -202,9 +252,9 @@ export async function updateCardProgress(
   newInterval: number
 ): Promise<void> {
   if (!db) throw new Error('Database not initialized');
-  
-  const nextReview = new Date();
-  nextReview.setDate(nextReview.getDate() + newInterval);
+  if (!cardId || cardId <= 0) throw new Error('Invalid card ID');
+  if (newEaseFactor < 0) throw new Error('Ease factor must be non-negative');
+  if (newInterval < 0) throw new Error('Interval must be non-negative');
   
   await db.runAsync(
     `UPDATE card_progress
@@ -227,6 +277,12 @@ export async function updateDailyStats(
   cardsIncorrect: number
 ): Promise<void> {
   if (!db) throw new Error('Database not initialized');
+  if (cardsReviewed < 0 || cardsCorrect < 0 || cardsIncorrect < 0) {
+    throw new Error('Stats values must be non-negative');
+  }
+  if (cardsCorrect + cardsIncorrect > cardsReviewed) {
+    throw new Error('Correct + incorrect cards cannot exceed total reviewed');
+  }
   
   const today = new Date().toISOString().split('T')[0];
   
@@ -243,6 +299,9 @@ export async function updateDailyStats(
 
 export async function getDailyStats(days: number = 30): Promise<any[]> {
   if (!db) throw new Error('Database not initialized');
+  if (days <= 0 || days > 365) {
+    throw new Error('Days must be between 1 and 365');
+  }
   
   const result = await db.getAllAsync(
     `SELECT * FROM daily_stats

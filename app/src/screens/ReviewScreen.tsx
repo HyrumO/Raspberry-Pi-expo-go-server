@@ -37,35 +37,45 @@ export default function ReviewScreen() {
     const currentCard = cards[currentIndex];
     const progress = await getCardProgress(currentCard.id);
 
-    if (progress) {
-      const result = calculateSpacedRepetition(
-        progress.ease_factor,
-        progress.interval,
-        difficulty
-      );
-
-      await updateCardProgress(
-        currentCard.id,
-        difficulty,
-        result.newEaseFactor,
-        result.newInterval
-      );
-
-      // Update session stats
-      const isCorrect = difficulty !== 'hard';
-      setSessionStats(prev => ({
-        reviewed: prev.reviewed + 1,
-        correct: prev.correct + (isCorrect ? 1 : 0),
-        incorrect: prev.incorrect + (isCorrect ? 0 : 1),
-      }));
+    if (!progress) {
+      console.error('Card progress not found for card:', currentCard.id);
+      // Skip to next card or handle error
+      if (currentIndex < cards.length - 1) {
+        setCurrentIndex(currentIndex + 1);
+      } else {
+        await loadCards();
+      }
+      return;
     }
+
+    const result = calculateSpacedRepetition(
+      progress.ease_factor,
+      progress.interval,
+      difficulty
+    );
+
+    await updateCardProgress(
+      currentCard.id,
+      difficulty,
+      result.newEaseFactor,
+      result.newInterval
+    );
+
+    // Calculate updated session stats
+    const isCorrect = difficulty !== 'hard';
+    const updatedStats = {
+      reviewed: sessionStats.reviewed + 1,
+      correct: sessionStats.correct + (isCorrect ? 1 : 0),
+      incorrect: sessionStats.incorrect + (isCorrect ? 0 : 1),
+    };
 
     // Move to next card or finish
     if (currentIndex < cards.length - 1) {
       setCurrentIndex(currentIndex + 1);
+      setSessionStats(updatedStats);
     } else {
-      // Save daily stats and reload
-      await updateDailyStats(sessionStats.reviewed + 1, sessionStats.correct + (difficulty !== 'hard' ? 1 : 0), sessionStats.incorrect + (difficulty === 'hard' ? 1 : 0));
+      // Save daily stats with updated values (no double counting)
+      await updateDailyStats(updatedStats.reviewed, updatedStats.correct, updatedStats.incorrect);
       await loadCards();
       setSessionStats({ reviewed: 0, correct: 0, incorrect: 0 });
     }

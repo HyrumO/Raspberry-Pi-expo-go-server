@@ -189,7 +189,7 @@ function startExpo() {
       EXPO_DEVTOOLS_LISTEN_ADDRESS: '0.0.0.0',
     };
 
-    expoProcess = spawn('npx', ['expo', 'start', '--tunnel'], {
+    expoProcess = spawn('npx', ['expo', 'start'], {
       stdio: 'inherit',
       env: env,
       shell: true,

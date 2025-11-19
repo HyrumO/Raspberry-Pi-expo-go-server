@@ -11,16 +11,29 @@ export interface AnkiDeckData {
 
 export async function pickAnkiFile(): Promise<string | null> {
   try {
+    // Support both .apkg files and zip files
+    // .apkg files are ZIP archives, so we accept both MIME types
     const result = await DocumentPicker.getDocumentAsync({
-      type: 'application/zip',
+      type: ['application/zip', 'application/x-zip-compressed', '*/*'],
       copyToCacheDirectory: true,
+      multiple: false,
     });
 
     if (result.canceled || !result.assets || result.assets.length === 0) {
       return null;
     }
 
-    return result.assets[0].uri;
+    const fileUri = result.assets[0].uri;
+    const fileName = result.assets[0].name || '';
+    
+    // Verify it's an Anki deck file (.apkg) or zip file
+    if (!fileName.toLowerCase().endsWith('.apkg') && 
+        !fileName.toLowerCase().endsWith('.zip')) {
+      console.warn('Selected file may not be an Anki deck. Expected .apkg or .zip file.');
+      // Still proceed - the file might be valid even without the extension
+    }
+
+    return fileUri;
   } catch (error) {
     console.error('Error picking file:', error);
     return null;
@@ -31,7 +44,7 @@ export async function parseAnkiFile(fileUri: string): Promise<AnkiDeckData | nul
   try {
     // Read the file
     const base64 = await FileSystem.readAsStringAsync(fileUri, {
-      encoding: FileSystem.EncodingType.Base64,
+      encoding: 'base64',
     });
 
     // Convert base64 to binary

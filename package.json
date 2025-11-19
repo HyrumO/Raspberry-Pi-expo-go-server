@@ -5,6 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
+    "start:local": "cd app && npx expo start --lan",
     "dev": "node server.js"
   },
   "keywords": [
@@ -23,7 +24,7 @@
     "dotenv": "^16.3.1"
   },
   "engines": {
-    "node": ">=14.0.0"
+    "node": ">=18.0.0"
   }
 }
 

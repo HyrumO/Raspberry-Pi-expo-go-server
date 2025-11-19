@@ -80,8 +80,12 @@ export default function StatsScreen() {
 
   return (
     <View className={`flex-1 ${isDark ? 'bg-background-dark' : 'bg-background-light'}`}>
-      <ScrollView className="flex-1 p-4">
-        <Text className={`text-3xl font-bold mb-6 ${isDark ? 'text-text-dark' : 'text-text-light'}`}>
+      <ScrollView 
+        className="flex-1"
+        contentContainerStyle={{ padding: 16 }}
+        showsVerticalScrollIndicator={false}
+      >
+        <Text className={`text-2xl font-bold mb-6 mt-2 ${isDark ? 'text-text-dark' : 'text-text-light'}`}>
           Statistics
         </Text>
         

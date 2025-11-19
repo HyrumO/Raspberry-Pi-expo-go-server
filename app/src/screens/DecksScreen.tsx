@@ -61,11 +61,15 @@ export default function DecksScreen() {
 
   return (
     <View className={`flex-1 ${isDark ? 'bg-background-dark' : 'bg-background-light'}`}>
-      <ScrollView className="flex-1 p-4">
-        <View className="flex-row justify-between items-center mb-6">
+      <ScrollView 
+        className="flex-1"
+        contentContainerStyle={{ padding: 16 }}
+        showsVerticalScrollIndicator={false}
+      >
+        <View className="flex-row justify-between items-center mb-6 mt-2">
           <View className="flex-row items-center">
-            <Ionicons name="folder" size={28} color="#14b8a6" />
-            <Text className={`ml-2 text-3xl font-bold ${isDark ? 'text-text-dark' : 'text-text-light'}`}>
+            <Ionicons name="folder" size={24} color="#14b8a6" />
+            <Text className={`ml-2 text-2xl font-bold ${isDark ? 'text-text-dark' : 'text-text-light'}`}>
               My Decks
             </Text>
           </View>

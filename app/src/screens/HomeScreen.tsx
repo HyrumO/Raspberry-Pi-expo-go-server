@@ -62,151 +62,161 @@ export default function HomeScreen() {
   const hasContent = totalDecks > 0 || cardsDue > 0;
 
   return (
-    <ScrollView className={`flex-1 ${isDark ? 'bg-background-dark' : 'bg-background-light'}`}>
-      <View className="p-4">
-        {/* Welcome Section */}
-        <View className="mb-6">
-          <Text className={`text-3xl font-bold mb-2 ${isDark ? 'text-text-dark' : 'text-text-light'}`}>
+    <View className={`flex-1 ${isDark ? 'bg-background-dark' : 'bg-background-light'}`}>
+      <ScrollView 
+        className="flex-1"
+        contentContainerStyle={{ padding: 16 }}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Welcome Header */}
+        <View className="mb-6 mt-2">
+          <Text className={`text-2xl font-bold mb-1 ${isDark ? 'text-text-dark' : 'text-text-light'}`}>
             Welcome Back!
           </Text>
-          <Text className={`text-base ${isDark ? 'text-text-muted' : 'text-text-muted'}`}>
+          <Text className={`text-sm ${isDark ? 'text-text-muted' : 'text-text-muted'}`}>
             Ready to continue your Arabic learning journey?
           </Text>
         </View>
 
         {/* Quick Actions */}
-        {hasContent ? (
-          <View className="mb-6">
-            <Text className={`text-lg font-semibold mb-3 ${isDark ? 'text-text-dark' : 'text-text-light'}`}>
-              Quick Actions
-            </Text>
-            <View className="space-y-3">
-              <TouchableOpacity
-                onPress={() => navigation.navigate('Review' as never)}
-                className="bg-primary p-4 rounded-xl flex-row items-center justify-between"
-                disabled={cardsDue === 0}
-                style={{ opacity: cardsDue === 0 ? 0.5 : 1 }}
-              >
-                <View className="flex-row items-center flex-1">
-                  <Ionicons name="book" size={24} color="white" />
-                  <View className="ml-3 flex-1">
-                    <Text className="text-white text-lg font-semibold">Start Review</Text>
-                    <Text className="text-white/80 text-sm">
-                      {cardsDue > 0 ? `${cardsDue} cards due` : 'No cards due'}
-                    </Text>
-                  </View>
-                </View>
-                <Ionicons name="chevron-forward" size={20} color="white" />
-              </TouchableOpacity>
-
-              <View className="flex-row space-x-3">
-                <TouchableOpacity
-                  onPress={() => navigation.navigate('Decks' as never)}
-                  className={`flex-1 p-4 rounded-xl flex-row items-center justify-center ${isDark ? 'bg-surface-dark' : 'bg-surface-light'}`}
-                >
-                  <Ionicons name="folder" size={20} color={isDark ? '#14b8a6' : '#14b8a6'} />
-                  <Text className={`ml-2 font-semibold ${isDark ? 'text-text-dark' : 'text-text-light'}`}>
-                    Browse Decks
-                  </Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  onPress={() => navigation.navigate('Lookup' as never)}
-                  className={`flex-1 p-4 rounded-xl flex-row items-center justify-center ${isDark ? 'bg-surface-dark' : 'bg-surface-light'}`}
-                >
-                  <Ionicons name="search" size={20} color={isDark ? '#14b8a6' : '#14b8a6'} />
-                  <Text className={`ml-2 font-semibold ${isDark ? 'text-text-dark' : 'text-text-light'}`}>
-                    Lookup Word
-                  </Text>
-                </TouchableOpacity>
+        <View className="mb-6">
+          <Text className={`text-lg font-semibold mb-4 ${isDark ? 'text-text-dark' : 'text-text-light'}`}>
+            Quick Actions
+          </Text>
+          <View className="flex-row">
+            {/* Start Button - Yellow */}
+            <TouchableOpacity
+              onPress={() => navigation.navigate('Decks' as never)}
+              className="flex-1 p-5 rounded-2xl items-center justify-center mr-2"
+              style={{ backgroundColor: '#fbbf24' }}
+            >
+              <View className="w-12 h-12 rounded-full bg-white/20 items-center justify-center mb-3">
+                <Ionicons name="add-circle" size={28} color="white" />
               </View>
+              <Text className="text-white text-xl font-bold mb-1">Start</Text>
+              <Text className="text-white/90 text-xs text-center">Begin new learning session</Text>
+            </TouchableOpacity>
+
+            {/* Review Button - Teal */}
+            <TouchableOpacity
+              onPress={() => navigation.navigate('Review' as never)}
+              className="flex-1 p-5 rounded-2xl items-center justify-center ml-2"
+              style={{ backgroundColor: '#14b8a6', opacity: cardsDue === 0 ? 0.6 : 1 }}
+              disabled={cardsDue === 0}
+            >
+              <View className="w-12 h-12 rounded-full bg-white/20 items-center justify-center mb-3">
+                <Ionicons name="refresh" size={28} color="white" />
+              </View>
+              <Text className="text-white text-xl font-bold mb-1">Review</Text>
+              <Text className="text-white/90 text-xs text-center">
+                {cardsDue > 0 ? `${cardsDue} cards due` : 'No cards due'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Today's Stats */}
+        <View className="mb-6">
+          <Text className={`text-lg font-semibold mb-4 ${isDark ? 'text-text-dark' : 'text-text-light'}`}>
+            Today's Stats
+          </Text>
+          
+          {/* Words Learned */}
+          <View className={`mb-4 p-4 rounded-xl ${isDark ? 'bg-surface-dark' : 'bg-surface-light'}`}>
+            <View className="flex-row justify-between items-center mb-2">
+              <Text className={`text-sm font-medium ${isDark ? 'text-text-dark' : 'text-text-light'}`}>
+                Words Learned
+              </Text>
+              <Text className={`text-sm font-semibold ${isDark ? 'text-text-dark' : 'text-text-light'}`}>
+                {todayReviewed} / {dailyGoal}
+              </Text>
+            </View>
+            <View className={`h-2 rounded-full overflow-hidden ${isDark ? 'bg-background-dark' : 'bg-gray-200'}`}>
+              <View
+                className="h-full rounded-full"
+                style={{ width: `${progressPercentage}%`, backgroundColor: '#14b8a6' }}
+              />
             </View>
           </View>
-        ) : (
-          <View className={`mb-6 p-6 rounded-xl ${isDark ? 'bg-surface-dark' : 'bg-surface-light'}`}>
-            <Ionicons name="book-outline" size={48} color={isDark ? '#9ca3af' : '#6b7280'} style={{ alignSelf: 'center', marginBottom: 12 }} />
-            <Text className={`text-center text-lg font-semibold mb-2 ${isDark ? 'text-text-dark' : 'text-text-light'}`}>
-              Get Started
-            </Text>
-            <Text className={`text-center text-sm mb-4 ${isDark ? 'text-text-muted' : 'text-text-muted'}`}>
-              Import an Anki deck to start learning Arabic vocabulary!
+
+          {/* Daily Goal */}
+          <View className={`p-4 rounded-xl ${isDark ? 'bg-surface-dark' : 'bg-surface-light'}`}>
+            <View className="flex-row justify-between items-center mb-2">
+              <Text className={`text-sm font-medium ${isDark ? 'text-text-dark' : 'text-text-light'}`}>
+                Daily Goal
+              </Text>
+              <Text className={`text-sm font-semibold`} style={{ color: '#fbbf24' }}>
+                {Math.round(progressPercentage)}%
+              </Text>
+            </View>
+            <View className={`h-2 rounded-full overflow-hidden ${isDark ? 'bg-background-dark' : 'bg-gray-200'}`}>
+              <View
+                className="h-full rounded-full"
+                style={{ width: `${progressPercentage}%`, backgroundColor: '#fbbf24' }}
+              />
+            </View>
+          </View>
+        </View>
+
+        {/* No Cards Due Message */}
+        {cardsDue === 0 && hasContent && (
+          <View className={`mb-6 p-4 rounded-xl flex-row items-center ${isDark ? 'bg-surface-dark' : 'bg-surface-light'}`}>
+            <Ionicons name="checkmark-circle" size={24} color="#14b8a6" />
+            <View className="ml-3 flex-1">
+              <Text className={`font-semibold mb-1 ${isDark ? 'text-text-dark' : 'text-text-light'}`}>
+                No cards due today
+              </Text>
+              <Text className={`text-xs ${isDark ? 'text-text-muted' : 'text-text-muted'}`}>
+                Review a deck to get started
+              </Text>
+            </View>
+          </View>
+        )}
+
+        {/* Decks Section */}
+        {hasContent && (
+          <View className="mb-6">
+            <Text className={`text-lg font-semibold mb-4 ${isDark ? 'text-text-dark' : 'text-text-light'}`}>
+              Decks
             </Text>
             <TouchableOpacity
               onPress={() => navigation.navigate('Decks' as never)}
-              className="bg-primary p-3 rounded-lg"
+              className={`p-4 rounded-xl flex-row items-center ${isDark ? 'bg-surface-dark' : 'bg-surface-light'}`}
             >
-              <Text className="text-white text-center font-semibold">Import Anki Deck</Text>
+              <Ionicons name="folder" size={24} color="#14b8a6" />
+              <View className="ml-3 flex-1">
+                <Text className={`font-semibold ${isDark ? 'text-text-dark' : 'text-text-light'}`}>
+                  Browse all decks
+                </Text>
+                <Text className={`text-xs mt-1 ${isDark ? 'text-text-muted' : 'text-text-muted'}`}>
+                  {totalDecks} {totalDecks === 1 ? 'deck' : 'decks'} available
+                </Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color={isDark ? '#9ca3af' : '#6b7280'} />
             </TouchableOpacity>
           </View>
         )}
 
-        {/* Today's Stats Preview */}
-        {hasContent && (
-          <View className={`mb-6 p-4 rounded-xl ${isDark ? 'bg-surface-dark' : 'bg-surface-light'}`}>
-            <Text className={`text-lg font-semibold mb-4 ${isDark ? 'text-text-dark' : 'text-text-light'}`}>
-              Today's Progress
+        {/* Empty State */}
+        {!hasContent && (
+          <View className={`p-8 rounded-xl items-center ${isDark ? 'bg-surface-dark' : 'bg-surface-light'}`}>
+            <Ionicons name="book-outline" size={64} color={isDark ? '#9ca3af' : '#6b7280'} />
+            <Text className={`text-xl font-semibold mt-4 mb-2 ${isDark ? 'text-text-dark' : 'text-text-light'}`}>
+              Get Started
             </Text>
-
-            {/* Daily Goal Progress */}
-            <View className="mb-4">
-              <View className="flex-row justify-between items-center mb-2">
-                <Text className={`text-sm ${isDark ? 'text-text-muted' : 'text-text-muted'}`}>
-                  Daily Goal
-                </Text>
-                <Text className={`text-sm font-semibold ${isDark ? 'text-text-dark' : 'text-text-light'}`}>
-                  {todayReviewed} / {dailyGoal}
-                </Text>
-              </View>
-              <View className={`h-3 rounded-full overflow-hidden ${isDark ? 'bg-background-dark' : 'bg-gray-200'}`}>
-                <View
-                  className="h-full bg-primary rounded-full"
-                  style={{ width: `${progressPercentage}%` }}
-                />
-              </View>
-            </View>
-
-            {/* Stats Grid */}
-            <View className="flex-row space-x-3">
-              <View className="flex-1 p-3 rounded-lg" style={{ backgroundColor: isDark ? '#1a1a1a' : '#ffffff' }}>
-                <View className="flex-row items-center mb-1">
-                  <Ionicons name="time-outline" size={16} color="#14b8a6" />
-                  <Text className={`ml-1 text-xs ${isDark ? 'text-text-muted' : 'text-text-muted'}`}>
-                    Cards Due
-                  </Text>
-                </View>
-                <Text className={`text-2xl font-bold ${isDark ? 'text-primary' : 'text-primary-dark'}`}>
-                  {cardsDue}
-                </Text>
-              </View>
-
-              <View className="flex-1 p-3 rounded-lg" style={{ backgroundColor: isDark ? '#1a1a1a' : '#ffffff' }}>
-                <View className="flex-row items-center mb-1">
-                  <Ionicons name="checkmark-circle-outline" size={16} color="#fbbf24" />
-                  <Text className={`ml-1 text-xs ${isDark ? 'text-text-muted' : 'text-text-muted'}`}>
-                    Reviewed
-                  </Text>
-                </View>
-                <Text className={`text-2xl font-bold`} style={{ color: '#fbbf24' }}>
-                  {todayReviewed}
-                </Text>
-              </View>
-
-              <View className="flex-1 p-3 rounded-lg" style={{ backgroundColor: isDark ? '#1a1a1a' : '#ffffff' }}>
-                <View className="flex-row items-center mb-1">
-                  <Ionicons name="flame" size={16} color="#f59e0b" />
-                  <Text className={`ml-1 text-xs ${isDark ? 'text-text-muted' : 'text-text-muted'}`}>
-                    Streak
-                  </Text>
-                </View>
-                <Text className={`text-2xl font-bold`} style={{ color: '#f59e0b' }}>
-                  {streak}
-                </Text>
-              </View>
-            </View>
+            <Text className={`text-center text-sm mb-6 ${isDark ? 'text-text-muted' : 'text-text-muted'}`}>
+              Import an Anki deck to start learning Arabic vocabulary!
+            </Text>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('Decks' as never)}
+              className="bg-primary px-6 py-3 rounded-lg"
+            >
+              <Text className="text-white font-semibold">Import Anki Deck</Text>
+            </TouchableOpacity>
           </View>
         )}
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 }
 

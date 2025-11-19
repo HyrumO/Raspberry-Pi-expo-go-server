@@ -110,9 +110,13 @@ export default function ReviewScreen() {
 
   return (
     <View className={`flex-1 ${isDark ? 'bg-background-dark' : 'bg-background-light'}`}>
-      <ScrollView className="flex-1 p-4">
+      <ScrollView 
+        className="flex-1"
+        contentContainerStyle={{ padding: 16 }}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Progress Indicator */}
-        <View className={`mb-6 p-4 rounded-xl ${isDark ? 'bg-surface-dark' : 'bg-surface-light'}`}>
+        <View className={`mb-6 p-4 rounded-xl mt-2 ${isDark ? 'bg-surface-dark' : 'bg-surface-light'}`}>
           <View className="flex-row justify-between items-center mb-2">
             <Text className={`text-sm font-semibold ${isDark ? 'text-text-dark' : 'text-text-light'}`}>
               Card {progress} of {total}

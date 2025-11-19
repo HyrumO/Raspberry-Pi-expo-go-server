@@ -27,10 +27,14 @@ export default function LookupScreen() {
 
   return (
     <View className={`flex-1 ${isDark ? 'bg-background-dark' : 'bg-background-light'}`}>
-      <ScrollView className="flex-1 p-4">
-        <View className="flex-row items-center mb-6">
-          <Ionicons name="search" size={28} color="#14b8a6" />
-          <Text className={`ml-2 text-3xl font-bold ${isDark ? 'text-text-dark' : 'text-text-light'}`}>
+      <ScrollView 
+        className="flex-1"
+        contentContainerStyle={{ padding: 16 }}
+        showsVerticalScrollIndicator={false}
+      >
+        <View className="flex-row items-center mb-6 mt-2">
+          <Ionicons name="search" size={24} color="#14b8a6" />
+          <Text className={`ml-2 text-2xl font-bold ${isDark ? 'text-text-dark' : 'text-text-light'}`}>
             Word Lookup
           </Text>
         </View>

@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as FileSystem from 'expo-file-system';
+import { Paths, File } from 'expo-file-system';
 import { DictionaryEntry } from '../types/dictionary';
 import { Deck } from '../types/deck';
 import { Card } from '../types/card';
@@ -53,10 +54,13 @@ export async function exportBackup(): Promise<string | null> {
     };
 
     const json = JSON.stringify(backup, null, 2);
-    const fileUri = FileSystem.documentDirectory + `backup_${Date.now()}.json`;
-
-    await FileSystem.writeAsStringAsync(fileUri, json);
-    return fileUri;
+    // Create a temporary file in cache directory
+    const file = new File(Paths.cache, `backup_${Date.now()}.json`);
+    const writer = await file.writableStream().getWriter();
+    const encoder = new TextEncoder();
+    await writer.write(encoder.encode(json));
+    await writer.close();
+    return file.uri;
   } catch (error) {
     console.error('Error exporting backup:', error);
     return null;

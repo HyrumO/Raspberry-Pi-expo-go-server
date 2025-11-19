@@ -211,7 +211,7 @@ export async function deleteCard(id: number): Promise<void> {
   
   // Update deck card count
   await db.runAsync(
-    'UPDATE decks SET card_count = GREATEST(0, card_count - 1), updated_at = datetime("now") WHERE id = ?',
+    'UPDATE decks SET card_count = CASE WHEN card_count > 0 THEN card_count - 1 ELSE 0 END, updated_at = datetime("now") WHERE id = ?',
     [card.deck_id]
   );
 }

@@ -9,6 +9,8 @@ Notifications.setNotificationHandler({
     shouldShowAlert: true,
     shouldPlaySound: true,
     shouldSetBadge: true,
+    shouldShowBanner: true,
+    shouldShowList: true,
   }),
 });
 
@@ -51,7 +53,7 @@ export async function scheduleDailyReminder(hour: number = 9, minute: number = 0
         hour,
         minute,
         repeats: true,
-      },
+      } as any,
     });
 
     // Save notification settings

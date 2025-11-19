@@ -42,6 +42,15 @@ export function Flashcard({ card, onFlip }: FlashcardProps) {
       onPress={handleFlip}
       className={`p-6 rounded-xl mb-4 ${isDark ? 'bg-surface-dark' : 'bg-surface-light'}`}
       activeOpacity={0.8}
+      style={{
+        borderWidth: 2,
+        borderColor: isFlipped ? '#14b8a6' : 'transparent',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: isDark ? 0.2 : 0.1,
+        shadowRadius: 8,
+        elevation: 5,
+      }}
     >
       <View className="min-h-[200px] justify-center items-center">
         <Animated.View
@@ -52,11 +61,11 @@ export function Flashcard({ card, onFlip }: FlashcardProps) {
           }}
         >
           <View className="items-center">
-            <Text className={`text-3xl font-bold mb-4 ${isDark ? 'text-text-dark' : 'text-text-light'}`}>
+            <Text className={`text-4xl font-bold mb-4 ${isDark ? 'text-text-dark' : 'text-text-light'}`}>
               {card.front}
             </Text>
             {card.pronunciation && (
-              <Text className={`text-lg ${isDark ? 'text-text-muted' : 'text-text-muted'}`}>
+              <Text className={`text-lg mb-4 ${isDark ? 'text-text-muted' : 'text-text-muted'}`}>
                 {card.pronunciation}
               </Text>
             )}
@@ -73,13 +82,15 @@ export function Flashcard({ card, onFlip }: FlashcardProps) {
           }}
         >
           <View className="items-center">
-            <Text className={`text-2xl font-semibold mb-4 ${isDark ? 'text-text-dark' : 'text-text-light'}`}>
+            <Text className={`text-3xl font-semibold mb-4 ${isDark ? 'text-text-dark' : 'text-text-light'}`}>
               {card.back}
             </Text>
             {card.example_sentence && (
-              <Text className={`text-base mt-2 ${isDark ? 'text-text-muted' : 'text-text-muted'}`}>
-                {card.example_sentence}
-              </Text>
+              <View className={`mt-4 p-3 rounded-lg ${isDark ? 'bg-background-dark' : 'bg-gray-100'}`}>
+                <Text className={`text-base text-center ${isDark ? 'text-text-muted' : 'text-text-muted'}`}>
+                  {card.example_sentence}
+                </Text>
+              </View>
             )}
           </View>
         </Animated.View>
